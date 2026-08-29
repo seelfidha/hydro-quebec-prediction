@@ -1,11 +1,13 @@
 services:
-#  app:
-#    build: .
-#    container_name: data_loader
-#    ports:
-#      - "8501:8501"
-#    depends_on:
-#      - postgres
+  app:
+    container_name: data_loader
+    build:
+      context: .
+      dockerfile: load/Dockerfile
+    ports:
+      - "8501:8501"
+    depends_on:
+      - postgres
 
   postgres:
     image: postgres:17
