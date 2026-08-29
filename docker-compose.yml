@@ -2,8 +2,8 @@ services:
   app:
     container_name: data_loader
     build:
-      context: .
-      dockerfile: load/Dockerfile
+      context: ./load
+      dockerfile: Dockerfile
     ports:
       - "8501:8501"
     depends_on:
