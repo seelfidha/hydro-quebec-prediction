@@ -112,7 +112,7 @@ scheduler = BlockingScheduler()
 @scheduler.scheduled_job("interval", minutes= MINUTES_OFFSET)
 def collect_data() :
     now = datetime.now()
-    print(f'Current execution at %s', now)
+    print(f'Current execution at {now}', flush=True)
     url_ID = 'https://pannes.hydroquebec.com/pannes/donnees/v3_0/bisversion.json'
     respID = requests.get(url_ID)
     respID.raise_for_status()

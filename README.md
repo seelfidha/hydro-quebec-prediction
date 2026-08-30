@@ -17,3 +17,7 @@ select count(*) from pannes
 select count(*) from processed_ids
 select * from pannes
 select callid_processed, count(id) from pannes group by callid_processed
+
+to export data from postgres container instance: 
+open terminal inside 'database' project folder and execute the following command: 
+docker exec postgres_db pg_dump -U root -d test_db > backup.sql
