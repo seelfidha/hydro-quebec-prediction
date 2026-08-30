@@ -9,7 +9,7 @@ MINUTES_OFFSET = 3
 
 def get_connection():
     return psycopg.connect(
-        host='localhost',
+        host='postgres',
         dbname='test_db',
         user='root',
         password='root',
