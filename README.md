@@ -1,3 +1,12 @@
+Run "docker compose up -d --build" in the project folder to create docker image for the following: 
+
+image for postgres server 
+image for pgadmin for postgres server 
+image for component loader 
+image for mlflow 
+
+Next to that the same command will create a volume for the database as well as a new container and run it 
+
 Configure postgres via docker 
     create a new server
         specify the server name 
@@ -18,6 +27,7 @@ select count(*) from processed_ids
 select * from pannes
 select callid_processed, count(id) from pannes group by callid_processed
 
-to export data from postgres container instance: 
+to export data & structure from postgres container instance: 
 open terminal inside 'database' project folder and execute the following command: 
-docker exec postgres_db pg_dump -U root -d test_db > backup.sql
+docker exec postgres_db pg_dump -U root -d test_db --schema-only > schema.sql
+docker exec postgres_db pg_dump -U root -d test_db --data-only > data.sql
