@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/init-old.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./database/data.sql:/docker-entrypoint-initdb.d/02-data.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U root -d test_db" ]
@@ -47,9 +47,9 @@ services:
       dockerfile: ./load/Dockerfile
     ports:
       - "8501:8501"
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
+    depends_on:
+      postgres:
+        condition: service_healthy
   trainer:
     build:
       context: .
@@ -57,10 +57,10 @@ services:
     container_name: data_trainer
     ports:
       - "8502:8502"
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
-#      mlflow:
-#        condition: service_started
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
 volumes:
   postgres_data:
