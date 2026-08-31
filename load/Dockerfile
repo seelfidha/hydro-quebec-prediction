@@ -1,8 +1,10 @@
 FROM python
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-EXPOSE 8501
+COPY load/requirements-loader.txt .
+RUN pip install --no-cache-dir -r requirements-loader.txt
+COPY load/ /app/load
+COPY repository/ /app/repository/
 
-CMD ["python", "-u", "main.py"]
+#EXPOSE 8501
+
+CMD ["python", "-u", "-m", "load.main"]

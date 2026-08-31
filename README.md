@@ -22,6 +22,7 @@ Once connected, the database tables will be automatically created and the data w
 This is under the test_db database, two main tables will be present : 
 processed_ids & pannes 
 here are some sql queries to check the data injected: 
+select count(distinct(callid_processed)) as distinct_hq_ids, count(*) as data_row from pannes
 select count(*) from pannes 
 select count(*) from processed_ids
 select * from pannes

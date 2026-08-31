@@ -1,14 +1,4 @@
 services:
-  app:
-    container_name: data_loader
-    build:
-      context: ./load
-      dockerfile: Dockerfile
-    ports:
-      - "8501:8501"
-    depends_on:
-      - postgres
-
   postgres:
     image: postgres:17
     restart: always
@@ -21,8 +11,14 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/init-old.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./database/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d test_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -35,7 +31,7 @@ services:
       - postgres
   mlflow:
     build:
-      context: ./mlflow
+      context: ./mlflows
     image: mlflow-recap:latest
     container_name: ml-flow
     ports:
@@ -44,6 +40,27 @@ services:
       - ./database:/mlflow/database
       - ./mlruns:/mlflow/mlruns
       - .:/work
-
+  loader:
+    container_name: data_loader
+    build:
+      context: .
+      dockerfile: ./load/Dockerfile
+    ports:
+      - "8501:8501"
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+  trainer:
+    build:
+      context: .
+      dockerfile: ./train/Dockerfile
+    container_name: data_trainer
+    ports:
+      - "8502:8502"
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#      mlflow:
+#        condition: service_started
 volumes:
   postgres_data:

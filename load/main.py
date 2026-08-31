@@ -1,42 +1,11 @@
 import json
 from datetime import datetime, timedelta
-
-import psycopg
 import requests
 from apscheduler.schedulers.blocking import BlockingScheduler
+from repository.pannes_repository import save_new_panne
+from repository.processed_id_repository import is_not_processed, mark_as_processed
 
 MINUTES_OFFSET = 3
-
-def get_connection():
-    return psycopg.connect(
-        host='postgres',
-        dbname='test_db',
-        user='root',
-        password='root',
-        port=5432
-    )
-
-def is_not_processed(conn, item_id):
-    with conn.cursor() as cursor:
-        cursor.execute('SELECT 1 FROM processed_ids where id =%s', (item_id,))
-        return cursor.fetchone() is None
-
-def mark_as_processed(conn, item_id):
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                """
-                INSERT INTO processed_ids (id)
-                VALUES (%s) ON CONFLICT (id) DO NOTHING
-                """,
-                (item_id,)
-            )
-            conn.commit()
-            return True
-    except Exception as e :
-        print(f"error saving id: %s", item_id)
-        conn.rollback()
-        return False
 
 def create_new_interruption_from_json(callID, panne):
     newPanne = Panne()
@@ -59,38 +28,6 @@ def empty_to_none(value):
     if value == "":
         return None
     return value
-
-def save_interruption(conn, item_id, data):
-    try:
-        with conn.cursor() as cursor:
-            query = """
-                    INSERT INTO pannes \
-                    (nb_clients_impactes, date_debut, date_fin, pannep, \
-                     longitude, latitude,\
-                     statut, info_non_utilise, cause, id_municipalite, id_msg_panne, callID_processed) \
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-                    ON CONFLICT (id) DO NOTHING; \
-                    """
-
-            params = (data.nb_clients_impactes,
-                      data.date_debut,
-                      data.date_fin,
-                      data.pannep,
-                      data.longitude,
-                      data.latitude,
-                      data.statut,
-                      data.info_non_utilise,
-                      data.cause,
-                      data.id_municipalite,
-                      data.id_msg_panne,
-                      data.callID_processed
-                      )
-
-            cursor.execute(query, params)
-            conn.commit()
-    except Exception as e :
-        print(f"error saving interruption data for id: %s with error: %s", item_id, e)
-        conn.rollback()
 
 class Panne():
     callID_processed: int
@@ -118,19 +55,18 @@ def collect_data() :
     respID.raise_for_status()
     callID = respID.json()
     print(f'this call_id: {callID} will be processed if it is not already saved in bd')
-    conn = get_connection()
-    if is_not_processed(conn, callID):
+    if is_not_processed(callID):
         print(f'new call_id {callID} detected ')
-        result = mark_as_processed(conn, callID)
+        result = mark_as_processed(callID)
         if result:
             print(f'new call_id {callID}  saved to db')
             url_data = f'https://pannes.hydroquebec.com/pannes/donnees/v3_0/bismarkers{callID}.json'
-            respData = requests.get(url_data, callID)
+            respData = requests.get(url_data)
             # parse interruption data
             data = respData.json()
             for panne_json in data['pannes']:
                 newPanne = create_new_interruption_from_json(callID, panne_json)
-                save_interruption(conn, callID, newPanne)
+                save_new_panne(callID, newPanne)
         else:
             print(f'error saving call_id {callID}')
     else:
