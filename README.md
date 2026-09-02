@@ -30,5 +30,5 @@ select callid_processed, count(id) from pannes group by callid_processed
 
 to export data & structure from postgres container instance: 
 open terminal inside 'database' project folder and execute the following command: 
-docker exec postgres_db pg_dump -U root -d test_db --schema-only > schema.sql
-docker exec postgres_db pg_dump -U root -d test_db --data-only > data.sql
+docker exec postgres_db pg_dump -U root -d test_db --schema-only | Set-Content -Encoding utf8 .\database\schema.sql
+docker exec postgres_db pg_dump -U root -d test_db --data-only | Set-Content -Encoding utf8 .\database\data.sql
