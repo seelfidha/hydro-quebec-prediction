@@ -1,11 +1,16 @@
-import h2o
+
 import mlflow
+import pandas as pd
+import h2o
+
 from h2o.automl import H2OAutoML
+from minio import Minio
+
 from repository.pannes_repository import get_pannes
-from train.utils import convert_rows_to_h2o_format, construct_h2o_format_frame
+from train.utils import convert_rows_to_h2o_format, handle_h2o_categorical_data, save_minio_instance
 
 
-def init_mlflow_h2o():
+def init_mlflow():
     mlflow.set_tracking_uri("http://mlflow:5000")
     experiment_name = "hydro-quebec-predictions"
     experiment = mlflow.get_experiment_by_name(experiment_name)
@@ -13,7 +18,8 @@ def init_mlflow_h2o():
         experiement_id = mlflow.create_experiment(experiment_name)
         experiment = mlflow.get_experiment(experiement_id)
     mlflow.set_experiment(experiment.name)
-    print("initiate h2o")
+
+def init_h2o():
     h2o.init(
         ip="127.0.0.1",
         port=54321,
@@ -21,24 +27,42 @@ def init_mlflow_h2o():
         verbose=True
     )
 
-if __name__ == '__main__':
-    print("read database data")
+def init_minio():
+    client_minio =Minio("minio:9000",access_key="admin", secret_key="strongpassword", secure=False)
+    bucket = "raw-data"
+    if not client_minio.bucket_exists(bucket):
+        client_minio.make_bucket(bucket)
+    return client_minio
+
+def get_data(minio):
+    print("read database")
     rows = get_pannes()
-    print("convert data to h2o format")
-    feature_row = convert_rows_to_h2o_format(rows)
-    print("convert data to h2o format")
+    print(f"convert {len(rows)} rows to h2o format")
+    feature_rows = convert_rows_to_h2o_format(rows)
+    print("create pandas frame")
+    pandas_frame = pd.DataFrame(feature_rows)
+    print("create pandas frame")
+    save_minio_instance(pandas_frame, minio)
+    return handle_h2o_categorical_data(pandas_frame)
+
+
+if __name__ == '__main__':
     print("initiate mlflow & h2o")
-    init_mlflow_h2o()
-    print("convert data to h2o format")
+    init_mlflow()
+    print("initiate h2o")
+    init_h2o()
+    print("initiate minio")
+    client_minio = init_minio()
     with mlflow.start_run(run_name="h2o_automl_nb_clients_impactes"):
-        train_frame = construct_h2o_format_frame(feature_row)
+        print("Get the data")
+        train_frame = get_data(client_minio)
         target = "nb_clients_impactes"
         predictors = [column for column in train_frame.columns if column != target]
         train, valid, test = train_frame.split_frame(ratios=[0.7, 0.15], seed=42)
 
         aml = H2OAutoML(
             max_models=2,
-            seed = 42,
+            seed=42,
             sort_metric="RMSE",
             project_name="hydroquebec-predictions"
         )

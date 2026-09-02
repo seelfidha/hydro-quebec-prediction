@@ -1,5 +1,7 @@
 from datetime import datetime
-import pandas as pd
+from io import BytesIO
+from minio import Minio
+
 import h2o
 
 PANNES_COLUMNS = [
@@ -26,9 +28,7 @@ CATEGORICAL_COLUMNS = [
     "debut_day_of_week",
 ]
 
-
-def construct_h2o_format_frame(feature_rows):
-    pandas_frame = pd.DataFrame(feature_rows)
+def handle_h2o_categorical_data(pandas_frame):
     train_frame = h2o.H2OFrame(pandas_frame)
     print(train_frame.col_names)
     for category in CATEGORICAL_COLUMNS:
@@ -72,7 +72,6 @@ def convert_rows_to_h2o_format(rows):
         )
     return converted_rows
 
-
 def to_float(value):
     if value in (None, ""):
         return None
@@ -81,7 +80,6 @@ def to_float(value):
     except (TypeError, ValueError):
         return None
 
-
 def convert_row(row):
     # convert data from database to key value
     result = {}
@@ -89,3 +87,14 @@ def convert_row(row):
         key = PANNES_COLUMNS[i]
         result[key] = row[i]
     return result
+
+def save_minio_instance(pandas_frame, minio):
+    csv_bytes = pandas_frame.to_csv(index=False).encode("utf-8")
+    csv_buffer = BytesIO(csv_bytes)
+    minio.put_object(
+        Bucket_name="ml-data",
+        object_name="datasets/train.csv",
+        data=csv_buffer,
+        length=len(csv_bytes),
+        content_type="text/csv"
+    )
