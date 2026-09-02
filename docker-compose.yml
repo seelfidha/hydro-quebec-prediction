@@ -40,6 +40,19 @@ services:
       - ./database:/mlflow/database
       - ./mlruns:/mlflow/mlruns
       - .:/work
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: root
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address":9001"
+
   loader:
     container_name: data_loader
     build:
@@ -64,3 +77,4 @@ services:
         condition: service_started
 volumes:
   postgres_data:
+  minio_data:
