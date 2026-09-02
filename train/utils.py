@@ -1,5 +1,6 @@
 from datetime import datetime
 import pandas as pd
+import h2o
 
 PANNES_COLUMNS = [
     "id",
