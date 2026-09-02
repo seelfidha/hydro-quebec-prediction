@@ -47,11 +47,11 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: root
-      MINIO_ROOT_PASSWORD: root
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: strongpassword
     volumes:
       - minio_data:/data
-    command: server /data --console-address":9001"
+    command: server /data --console-address ":9001"
 
   loader:
     container_name: data_loader
