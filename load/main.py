@@ -19,6 +19,7 @@ def collect_data_status():
 @app.post("/collect_data/activate")
 def toogle_collect_data():
     collect_data_status = True
+    print("Data loader activated")
     return {
         "collect_data_status": collect_data_status,
         "minutes_offset": LOADER_MINUTES_OFFSET
@@ -27,6 +28,7 @@ def toogle_collect_data():
 @app.post("/collect_data/deactivate")
 def toogle_collect_data():
     collect_data_status = False
+    print("Data loader deactivated")
     return {
         "collect_data_status": collect_data_status,
         "minutes_offset": LOADER_MINUTES_OFFSET
