@@ -11,7 +11,7 @@ def is_not_processed(item_id):
         print(f"error checking id already processed: {item_id}")
         raise
 
-def mark_as_processed(item_id):
+def save_as_processed(item_id):
     try:
         with get_connection_with_retries(10, 3) as conn:
             with conn.cursor() as cursor:

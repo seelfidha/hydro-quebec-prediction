@@ -17,3 +17,7 @@ minio_port = "9000"
 minio_url = minio_host+":"+minio_port
 minio_access_key = "admin"
 minio_secret = "strongpassword"
+
+LOADER_MINUTES_OFFSET = 3
+loader_fast_api_host = "0.0.0.0"
+loader_fast_api_port = 8501
