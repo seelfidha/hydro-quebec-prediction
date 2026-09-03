@@ -7,13 +7,13 @@ from minio import Minio
 
 from repository.pannes_repository import get_pannes
 from train.utils import convert_rows_to_h2o_format, handle_h2o_categorical_data, save_minio_instance
+from utils.params_config import ml_flow_url, h2o_port, h2o_host, minio_url, minio_access_key, minio_secret
 
 bucket = "csv-data"
 experiment_name = "hydro-quebec-predictions"
 
 def init_mlflow():
-    mlflow.set_tracking_uri("http://mlflow:5000")
-    experiment_name = "hydro-quebec-predictions"
+    mlflow.set_tracking_uri(ml_flow_url)
     experiment = mlflow.get_experiment_by_name(experiment_name)
     if experiment is None:
         experiement_id = mlflow.create_experiment(experiment_name)
@@ -22,15 +22,19 @@ def init_mlflow():
 
 def init_h2o():
     h2o.init(
-        ip="127.0.0.1",
-        port=54321,
+        ip=h2o_host,
+        port=h2o_port,
         start_h2o=True,
         verbose=True
     )
 
 def init_minio():
-    client_minio =Minio("minio:9000",access_key="admin", secret_key="strongpassword", secure=False)
-    bucket = "raw-data"
+    client_minio =Minio(
+        minio_url,
+        access_key=minio_access_key,
+        secret_key=minio_secret,
+        secure=False
+    )
     if not client_minio.bucket_exists(bucket):
         client_minio.make_bucket(bucket)
     return client_minio
