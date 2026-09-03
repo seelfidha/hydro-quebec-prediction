@@ -1,4 +1,3 @@
-
 import mlflow
 import pandas as pd
 import h2o
@@ -9,6 +8,8 @@ from minio import Minio
 from repository.pannes_repository import get_pannes
 from train.utils import convert_rows_to_h2o_format, handle_h2o_categorical_data, save_minio_instance
 
+bucket = "csv-data"
+experiment_name = "hydro-quebec-predictions"
 
 def init_mlflow():
     mlflow.set_tracking_uri("http://mlflow:5000")
@@ -41,8 +42,8 @@ def get_data(minio):
     feature_rows = convert_rows_to_h2o_format(rows)
     print("create pandas frame")
     pandas_frame = pd.DataFrame(feature_rows)
-    print("create pandas frame")
-    save_minio_instance(pandas_frame, minio)
+    print("save version data to minio")
+    save_minio_instance(pandas_frame, minio, bucket)
     return handle_h2o_categorical_data(pandas_frame)
 
 

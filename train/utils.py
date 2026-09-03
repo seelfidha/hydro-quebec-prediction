@@ -1,6 +1,5 @@
 from datetime import datetime
 from io import BytesIO
-from minio import Minio
 
 import h2o
 
@@ -88,11 +87,11 @@ def convert_row(row):
         result[key] = row[i]
     return result
 
-def save_minio_instance(pandas_frame, minio):
+def save_minio_instance(pandas_frame, minio, bucket):
     csv_bytes = pandas_frame.to_csv(index=False).encode("utf-8")
     csv_buffer = BytesIO(csv_bytes)
     minio.put_object(
-        Bucket_name="ml-data",
+        bucket_name= bucket,
         object_name="datasets/train.csv",
         data=csv_buffer,
         length=len(csv_bytes),
