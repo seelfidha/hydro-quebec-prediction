@@ -2,3 +2,4 @@ h2o
 mlflow
 psycopg[binary]
 pandas
+minio

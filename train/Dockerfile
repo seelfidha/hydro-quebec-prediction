@@ -9,6 +9,7 @@ RUN pip install --no-cache-dir -r requirements-trainer.txt
 
 COPY train/ /app/train
 COPY repository/ /app/repository/
+COPY utils/ /app/utils/
 
 #EXPOSE 8000
 

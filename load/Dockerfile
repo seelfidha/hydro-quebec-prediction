@@ -4,6 +4,7 @@ COPY load/requirements-loader.txt .
 RUN pip install --no-cache-dir -r requirements-loader.txt
 COPY load/ /app/load
 COPY repository/ /app/repository/
+COPY utils/ /app/utils/
 
 #EXPOSE 8501
 

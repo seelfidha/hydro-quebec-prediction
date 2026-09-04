@@ -1,9 +1,9 @@
 import mlflow
 import pandas as pd
 import h2o
+from minio import Minio
 
 from h2o.automl import H2OAutoML
-from minio import Minio
 
 from repository.pannes_repository import get_pannes
 from train.utils import convert_rows_to_h2o_format, handle_h2o_categorical_data, save_minio_instance
