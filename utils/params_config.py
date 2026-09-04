@@ -1,11 +1,11 @@
 
-db_host = "postgres"
+db_host = "localhost"
 db_port = "5432"
 db_name = "test_db"
 db_user = "root"
 db_pw = "root"
 
-ml_flow_host = "http://mlflow"
+ml_flow_host = "http://localhost"
 ml_flow_port = "5000"
 ml_flow_url = ml_flow_host+":"+ml_flow_port
 

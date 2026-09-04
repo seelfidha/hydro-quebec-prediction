@@ -18,6 +18,7 @@ def collect_data_status():
 
 @app.post("/collect_data/activate")
 def toogle_collect_data():
+    global collect_data_status
     collect_data_status = True
     print("Data loader activated")
     return {
@@ -27,6 +28,7 @@ def toogle_collect_data():
 
 @app.post("/collect_data/deactivate")
 def toogle_collect_data():
+    global collect_data_status
     collect_data_status = False
     print("Data loader deactivated")
     return {
