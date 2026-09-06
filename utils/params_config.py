@@ -1,9 +1,9 @@
 
-db_host = "postgres"
+db_host = "dpg-daec7eht0dsc739l7i50-a"#postgres#localhost
 db_port = "5432"
-db_name = "test_db"
+db_name = "interruption_db"
 db_user = "root"
-db_pw = "root"
+db_pw = "4WvlYwM7SbMfxp27cToQHC62tw1giS8a"#root
 
 ml_flow_host = "http://mlflow"
 ml_flow_port = "5000"
