@@ -2,7 +2,6 @@ import psycopg
 
 from repository.repository_config import get_connection_with_retries
 
-
 def get_pannes():
     with get_connection_with_retries(10, 3) as conn:
         try:
@@ -46,3 +45,19 @@ def save_new_panne(item_id, data):
     except Exception as e:
         print(f"error saving interruption data for id: {item_id} with error: {e}")
         raise
+
+def get_columns_names():
+    with get_connection_with_retries(10, 3) as conn:
+        try:
+            with conn.cursor() as cursor:
+                query = "SELECT column_name \
+                            FROM information_schema.columns \
+                              where table_name like 'pannes' \
+                            ORDER BY ordinal_position;"
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                return rows
+        except psycopg.OperationalError as error:
+            print(f"Error getting columns names from table pannes {error}")
+
+

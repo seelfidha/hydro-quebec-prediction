@@ -3,3 +3,5 @@ mlflow
 psycopg[binary]
 pandas
 minio
+fastapi
+uvicorn
