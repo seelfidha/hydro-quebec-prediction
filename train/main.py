@@ -8,7 +8,7 @@ from minio import Minio
 from h2o.automl import H2OAutoML
 
 from repository.pannes_repository import get_pannes
-from train.utils import convert_rows_to_h2o_format, handle_h2o_categorical_data, save_minio_instance
+from train.utils_trainer import convert_rows_to_h2o_format, handle_h2o_categorical_data, save_minio_instance
 from utils.params_config import ml_flow_url, h2o_port, h2o_host, minio_url, minio_access_key, minio_secret, \
     trainer_fast_api_host, trainer_fast_api_port
 

@@ -24,3 +24,6 @@ loader_fast_api_port = 8501
 
 trainer_fast_api_host = "0.0.0.0"
 trainer_fast_api_port = 8502
+
+hydro_quebec_url_ID = 'https://pannes.hydroquebec.com/pannes/donnees/v3_0/bisversion.json'
+hydro_quebec_url_data = 'https://pannes.hydroquebec.com/pannes/donnees/v3_0/bismarkers{callID}.json'

@@ -2,7 +2,7 @@ import threading
 import uvicorn
 
 from fastapi import FastAPI
-from load.utils_trainer import execute_data_collection
+from load.utils_loader import execute_data_collection
 from apscheduler.schedulers.blocking import BlockingScheduler
 from utils.params_config import loader_fast_api_port, loader_fast_api_host, LOADER_MINUTES_OFFSET
 app = FastAPI()

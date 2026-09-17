@@ -5,7 +5,7 @@ import requests
 
 from repository.pannes_repository import save_new_panne
 from repository.processed_id_repository import is_not_processed, save_as_processed
-from utils.params_config import LOADER_MINUTES_OFFSET
+from utils.params_config import LOADER_MINUTES_OFFSET, hydro_quebec_url_ID, hydro_quebec_url_data
 
 
 class Panne():
@@ -48,8 +48,7 @@ def create_new_interruption_from_json(callID, panne):
 def execute_data_collection():
     now = datetime.now()
     print(f'Current execution at {now}', flush=True)
-    url_ID = 'https://pannes.hydroquebec.com/pannes/donnees/v3_0/bisversion.json'
-    respID = requests.get(url_ID)
+    respID = requests.get(hydro_quebec_url_ID)
     respID.raise_for_status()
     callID = respID.json()
     print(f'this call_id: {callID} will be processed if it is not already saved in bd')
@@ -58,7 +57,8 @@ def execute_data_collection():
         result = save_as_processed(callID)
         if result:
             print(f'new call_id {callID}  saved to db')
-            url_data = f'https://pannes.hydroquebec.com/pannes/donnees/v3_0/bismarkers{callID}.json'
+            url_data = hydro_quebec_url_data.replace('{callID}', callID)
+            print(f'url_data: {url_data}')
             respData = requests.get(url_data)
             respData.raise_for_status()
             # parse interruption data
