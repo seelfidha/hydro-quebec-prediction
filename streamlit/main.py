@@ -28,7 +28,7 @@ def main():
 
     train_model_button = st.button(
         "train the model",
-        disabled= st.session_state.get('current_call_id') is None
+        disabled= st.session_state.get('current_call_id') is None or st.session_state.get("training_status") == 'RUNNING'
     )
 
     train_status_button = st.button(
@@ -39,7 +39,7 @@ def main():
     model_already_trained = st.session_state.get('model_already_trained')
     prediction_button = st.button(
         "start prediction",
-        disabled=model_already_trained is None or model_already_trained is False
+        disabled=model_already_trained is None or model_already_trained is False or st.session_state.get("training_status") == 'RUNNING'
     )
 
     if stop_collecting_button:
@@ -68,16 +68,22 @@ def main():
         run_id = start_training()
         print(f"training started with id {run_id}")
         st.session_state.training_id = run_id
+        st.session_state.training_status = "RUNNING"
+        st.rerun()
 
     if train_status_button:
         training_id = st.session_state.get('training_id')
         status = get_training_status(training_id)
+        print("training status: ",status)
+        st.write("the training process is in status: ",status)
         st.session_state.training_status = status
         if status == 'FINISHED':
             st.session_state.model_already_trained = True
+        st.rerun()
 
     if prediction_button:
         print(" start prediction ")
+        st.rerun()
 
     #with tab2:
         #pannes = get_pannes()

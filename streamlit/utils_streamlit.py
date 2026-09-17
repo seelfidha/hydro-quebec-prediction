@@ -27,7 +27,7 @@ def get_training_status(training_id):
     url = url_trainer_status_training.replace('{training_id}', training_id)
     resp = requests.get(url)
     resp.raise_for_status()
-    return resp.json()["run_id"]
+    return resp.json()["status"]
 
 def start_training():
     resp = requests.post(url_trainer_start_training)
