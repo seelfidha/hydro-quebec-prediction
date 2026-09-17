@@ -21,9 +21,12 @@ minio_secret = "strongpassword"
 LOADER_MINUTES_OFFSET = 3
 loader_fast_api_host = "0.0.0.0"
 loader_fast_api_port = 8501
+url_loader_deactivate = "http://localhost:8501/collect_data/deactivate"
+url_loader_delete_if_exists = "http://localhost:8501//collect_data/delete/{current_call_id}"
 
 trainer_fast_api_host = "0.0.0.0"
 trainer_fast_api_port = 8502
+url_trainer_start_training = "http://localhost:8502/train_data/start"
 
 hydro_quebec_url_ID = 'https://pannes.hydroquebec.com/pannes/donnees/v3_0/bisversion.json'
 hydro_quebec_url_data = 'https://pannes.hydroquebec.com/pannes/donnees/v3_0/bismarkers{callID}.json'
