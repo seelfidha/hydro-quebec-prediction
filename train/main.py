@@ -122,7 +122,7 @@ def train_model(run_id):
             print(f"Test MAE: {performance.mae()}")
 
 def save_the_leader(leader):
-    model_name = "hydroquebec-predictions"
+    model_name = "hydro-quebec-customers"
     model_info = mlflow.h2o.log_model(
         h2o_model = leader,
         artifact_path = "model",
