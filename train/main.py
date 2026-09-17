@@ -34,8 +34,9 @@ def init_mlflow_experiment(client):
             client.restore_experiment(experiment_id)
 
     mlflow.set_experiment(experiment_id=experiment_id)
+    experiment = client.get_experiment(experiment_id)
     print("mlflow experiment name : ", experiment.name)
-    return client.get_experiment(experiment_id)
+    return experiment
 
 def init_minio():
     client_minio =Minio(
