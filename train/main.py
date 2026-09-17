@@ -102,6 +102,9 @@ def train_model(run_id):
                 raise RuntimeError("No leaderboard found")
 
             leader = aml.leader
+
+            save_the_leader(leader)
+
             performance = leader.model_performance(test)
 
             mlflow.log_param("target", target)
@@ -118,6 +121,22 @@ def train_model(run_id):
             print(f"Test RMSE: {performance.rmse()}")
             print(f"Test MAE: {performance.mae()}")
 
+def save_the_leader(leader):
+    model_name = "hydroquebec-predictions"
+    model_info = mlflow.h2o.log_model(
+        h2o_model = leader,
+        artifact_path = "model",
+    )
+    version = mlflow.register_model(
+        model_uri = model_info.model_uri,
+        name = model_name
+    )
+
+    mlflow_client.set_registered_model_alias (
+        name = model_name,
+        alias = "champion",
+        verison = version.version
+    )
 
 def get_data(minio):
     print("read database")

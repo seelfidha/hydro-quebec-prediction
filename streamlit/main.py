@@ -83,6 +83,7 @@ def main():
 
     if prediction_button:
         print(" start prediction ")
+        #pannes = st.session_state.current_pannes
         st.rerun()
 
     #with tab2:
