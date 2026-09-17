@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict xLrqhcFfF8p1VlZXRrIak0K9ilTGCkKP0miMVqZyx9I5or3YxWK76KY2v7u56iP
+\restrict LEqzOAMHgTEnGxh4AarfHdD1xV8Cxxgo4mK7Tz2EQcxnkEotcKpObMFFLX2fw5x
 
 -- Dumped from database version 17.11 (Debian 17.11-1.pgdg13+2)
 -- Dumped by pg_dump version 17.11 (Debian 17.11-1.pgdg13+2)
@@ -93,12 +93,12 @@ ALTER TABLE ONLY public.processed_ids
 --
 
 ALTER TABLE ONLY public.pannes
-    ADD CONSTRAINT fk_callid_processed FOREIGN KEY (callid_processed) REFERENCES public.processed_ids(id);
+    ADD CONSTRAINT fk_callid_processed FOREIGN KEY (callid_processed) REFERENCES public.processed_ids(id) ON DELETE CASCADE;
 
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict xLrqhcFfF8p1VlZXRrIak0K9ilTGCkKP0miMVqZyx9I5or3YxWK76KY2v7u56iP
+\unrestrict LEqzOAMHgTEnGxh4AarfHdD1xV8Cxxgo4mK7Tz2EQcxnkEotcKpObMFFLX2fw5x
 
