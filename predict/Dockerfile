@@ -11,4 +11,4 @@ COPY utils/ ./utils/
 
 #EXPOSE 8501
 
-CMD ["python", "-u", "-m", "load.main"]
+CMD ["python", "-u", "-m", "predict.main"]

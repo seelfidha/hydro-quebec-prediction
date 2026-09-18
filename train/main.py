@@ -103,7 +103,7 @@ def train_model(run_id):
 
             leader = aml.leader
 
-            save_the_leader(leader)
+            save_the_leader(leader, mlflow)
 
             performance = leader.model_performance(test)
 
@@ -121,7 +121,7 @@ def train_model(run_id):
             print(f"Test RMSE: {performance.rmse()}")
             print(f"Test MAE: {performance.mae()}")
 
-def save_the_leader(leader):
+def save_the_leader(leader, mlflow):
     model_name = "hydro-quebec-customers"
     model_info = mlflow.h2o.log_model(
         h2o_model = leader,
