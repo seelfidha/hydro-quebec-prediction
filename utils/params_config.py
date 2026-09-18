@@ -29,7 +29,7 @@ trainer_fast_api_port = 8502
 url_trainer_start_training = "http://localhost:8502/train_data/start"
 url_trainer_status_training = "http://localhost:8502/train_data/status/{training_id}"
 
-target_column = "nb_clients_impactes"
+target_column = "duration_minutes"
 
 predictor_fast_api_host = "0.0.0.0"
 predictor_fast_api_port = 8503

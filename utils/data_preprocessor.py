@@ -3,6 +3,8 @@ from io import BytesIO
 
 import h2o
 
+from utils.params_config import target_column
+
 PANNES_COLUMNS = [
     "id",
     "nb_clients_impactes",
@@ -20,6 +22,7 @@ PANNES_COLUMNS = [
 ]
 
 CATEGORICAL_COLUMNS = [
+    "cause",
     "pannep",
     "statut",
     "id_municipalite",
@@ -28,11 +31,13 @@ CATEGORICAL_COLUMNS = [
 ]
 
 def handle_h2o_categorical_data(pandas_frame):
-    train_frame = h2o.H2OFrame(pandas_frame)
-    print(train_frame.col_names)
-    for category in CATEGORICAL_COLUMNS:
-        train_frame[category] = train_frame[category].asfactor()
-    return train_frame
+    # Set types before parsing so numeric category codes are not inferred as real values.
+    column_types = {
+        column: "enum"
+        for column in CATEGORICAL_COLUMNS
+        if column in pandas_frame.columns
+    }
+    return h2o.H2OFrame(pandas_frame, column_types=column_types)
 
 def convert_rows_to_h2o_format(rows):
     # adapt the data to h2o format
@@ -43,7 +48,7 @@ def convert_rows_to_h2o_format(rows):
 
         new_feature = convert_dict_to_json(dict)
 
-        if new_feature['nb_clients_impactes'] is not None:
+        if new_feature[target_column] is not None:
             converted_rows.append(new_feature)
 
     if(len(converted_rows) < 20):

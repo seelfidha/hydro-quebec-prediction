@@ -37,7 +37,7 @@ def train_data_status():
 @app.post("/predict")
 def predict(payload: dict[str, Any] = Body(...)):
 
-    print(payload)
+    print(f"Payload: {payload}")
 
     # champion_info = get_model_champion_info()
     # print(f'Model champion name: {champion_info.name}')
