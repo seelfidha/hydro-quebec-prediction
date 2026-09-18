@@ -39,12 +39,31 @@ def convert_rows_to_h2o_format(rows):
     converted_rows = []
     for data in rows:
 
-        row = convert_row(data)
+        dict = convert_db_row_to_dict(data)
 
-        date_debut = row["date_debut"]
-        date_fin = row["date_fin"]
+        new_feature = convert_dict_to_json(dict)
 
-        new_feature = {
+        if new_feature['nb_clients_impactes'] is not None:
+            converted_rows.append(new_feature)
+
+    if(len(converted_rows) < 20):
+        raise RuntimeError(
+            "less than 20 rows are available for learning"
+        )
+    return converted_rows
+
+def convert_db_row_to_dict(row):
+    # convert data from database to key value
+    result = {}
+    for i in range(0, len(PANNES_COLUMNS)) :
+        key = PANNES_COLUMNS[i]
+        result[key] = row[i]
+    return result
+
+def convert_dict_to_json(row):
+    date_debut = row["date_debut"]
+    date_fin = row["date_fin"]
+    return  {
             "nb_clients_impactes": to_float(row["nb_clients_impactes"]),
             "longitude": to_float(row["longitude"]),
             "latitude": to_float(row["latitude"]),
@@ -62,14 +81,6 @@ def convert_rows_to_h2o_format(rows):
                 else None
             ),
         }
-        if new_feature['nb_clients_impactes'] is not None:
-            converted_rows.append(new_feature)
-
-    if(len(converted_rows) < 20):
-        raise RuntimeError(
-            "less than 20 rows are available for learning"
-        )
-    return converted_rows
 
 def to_float(value):
     if value in (None, ""):
@@ -78,14 +89,6 @@ def to_float(value):
         return float(value)
     except (TypeError, ValueError):
         return None
-
-def convert_row(row):
-    # convert data from database to key value
-    result = {}
-    for i in range(0, len(PANNES_COLUMNS)) :
-        key = PANNES_COLUMNS[i]
-        result[key] = row[i]
-    return result
 
 def save_minio_instance(pandas_frame, minio, bucket):
     csv_bytes = pandas_frame.to_csv(index=False).encode("utf-8")

@@ -4,12 +4,13 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends default-jre-headless \
     && rm -rf /var/lib/apt/lists/*
+
 COPY train/requirements-trainer.txt .
 RUN pip install --no-cache-dir -r requirements-trainer.txt
 
-COPY train/ /app/train
-COPY repository/ /app/repository/
-COPY utils/ /app/utils/
+COPY train/ ./train
+COPY repository/ ./repository/
+COPY utils/ ./utils/
 
 #EXPOSE 8000
 
