@@ -14,7 +14,7 @@ from psycopg.types import none
 from repository.pannes_repository import get_pannes
 from utils.data_preprocessor import convert_rows_to_h2o_format, handle_h2o_categorical_data, save_minio_instance
 from utils.params_config import ml_flow_url, h2o_port, h2o_host, minio_url, minio_access_key, minio_secret, \
-    trainer_fast_api_host, trainer_fast_api_port
+    trainer_fast_api_host, trainer_fast_api_port, target_column
 
 bucket = "csv-data"
 experiment_name = "hydro-quebec-predictions"
@@ -85,8 +85,8 @@ def train_model(run_id):
         with mlflow.start_run(run_id=run_id):
             print("Get the data")
             train_frame = preprocess_training_data()
-            target = "nb_clients_impactes"
-            predictors = [column for column in train_frame.columns if column != target]
+
+            predictors = [column for column in train_frame.columns if column != target_column]
             train, valid, test = train_frame.split_frame(ratios=[0.7, 0.15], seed=42)
 
             aml = H2OAutoML(
@@ -96,7 +96,7 @@ def train_model(run_id):
                 project_name="hydroquebec-predictions"
             )
 
-            aml.train(x=predictors, y=target, training_frame=train, validation_frame=valid)
+            aml.train(x=predictors, y=target_column, training_frame=train, validation_frame=valid)
 
             if aml.leader is none:
                 raise RuntimeError("No leaderboard found")
@@ -107,7 +107,7 @@ def train_model(run_id):
 
             performance = leader.model_performance(test)
 
-            mlflow.log_param("target", target)
+            mlflow.log_param("target", target_column)
             mlflow.log_param("predictors", ",".join(predictors))
             mlflow.log_param("train_rows", train.nrows)
             mlflow.log_param("valid_rows", valid.nrows)

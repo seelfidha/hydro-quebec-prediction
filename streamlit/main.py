@@ -2,7 +2,7 @@ import requests
 import streamlit as st
 
 from utils.data_preprocessor import convert_dict_to_json
-from utils.params_config import url_predictor_predict
+from utils.params_config import url_predictor_predict, target_column
 from utils_streamlit import get_training_status
 from utils_streamlit import load_current_call_id, load_panne_by_id, \
     deactivate_data_loading, delete_current_call_id_if_exists, start_training, init_session_vars
@@ -99,11 +99,21 @@ def main():
         st.session_state.show_pannes = True
         panne = st.session_state.current_pannes.pop(0)
         values = vars(panne)
-        resp = requests.post(
-            url_predictor_predict,
-            json= convert_dict_to_json(values),
-        )
-        print(resp.json())
+        json = convert_dict_to_json(values)
+        target = json.pop(target_column)
+        # print(json)
+        try:
+            resp = requests.post(
+                url_predictor_predict,
+                json=json,
+            )
+        except Exception:
+            print('Error in prediction')
+            resp = None
+        if resp is not None:
+            print(f'real target value: {target} vs predicted value: {resp.json().get("prediction")}')
+        else:
+            print(f'Cannot predict target value, real value is {target}')
         st.rerun()
 
     if st.session_state.get("show_pannes", False) :
