@@ -78,6 +78,16 @@ services:
         condition: service_healthy
       mlflow:
         condition: service_started
+  predictor:
+    build:
+      context: .
+      dockerfile: ./predict/Dockerfile
+    container_name: data_predictor
+    ports:
+      - "8503:8503"
+    depends_on:
+      mlflow:
+        condition: service_started
 volumes:
   postgres_data:
   minio_data:
