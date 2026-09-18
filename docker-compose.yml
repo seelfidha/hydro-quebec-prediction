@@ -71,6 +71,8 @@ services:
       context: .
       dockerfile: ./train/Dockerfile
     container_name: data_trainer
+    volumes:
+      - ./mlruns:/mlflow/mlruns
     ports:
       - "8502:8502"
     depends_on:
@@ -83,6 +85,8 @@ services:
       context: .
       dockerfile: ./predict/Dockerfile
     container_name: data_predictor
+    volumes:
+      - ./mlruns:/mlflow/mlruns
     ports:
       - "8503:8503"
     depends_on:

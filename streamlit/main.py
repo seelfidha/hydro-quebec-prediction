@@ -1,11 +1,15 @@
+import requests
 import streamlit as st
 
+from utils.data_preprocessor import convert_dict_to_json
+from utils.params_config import url_predictor_predict
 from utils_streamlit import get_training_status
 from utils_streamlit import load_current_call_id, load_panne_by_id, \
     deactivate_data_loading, delete_current_call_id_if_exists, start_training, init_session_vars
 
 
 def main():
+    global values
     st.title("Hydro-quebec data prediction")
 
     #barside = st.sidebar
@@ -22,12 +26,19 @@ def main():
     init_session_vars(st)
 
     #deactivate button stop_collecting_data once current_call_id is not null
+    collecting_data_deactivated = st.session_state.get('collecting_data_deactivated')
     stop_collecting_button = st.button(
         "Stop collecting data",
-        disabled= st.session_state.get('current_call_id') is not None)
+        disabled=collecting_data_deactivated is not None
+    )
+
+    get_data_for_prediction_button = st.button(
+        "Get data for prediction",
+        disabled= collecting_data_deactivated is None or collecting_data_deactivated  is False
+    )
 
     train_model_button = st.button(
-        "train the model",
+        "Train the model",
         disabled= st.session_state.get('current_call_id') is None or st.session_state.get("training_status") == 'RUNNING'
     )
 
@@ -38,15 +49,17 @@ def main():
 
     model_already_trained = st.session_state.get('model_already_trained')
     prediction_button = st.button(
-        "start prediction",
+        "Predict first element",
         disabled=model_already_trained is None or model_already_trained is False or st.session_state.get("training_status") == 'RUNNING'
     )
 
     if stop_collecting_button:
-
         #deactivate loading data
         deactivate_data_loading()
+        st.session_state.collecting_data_deactivated = True
+        st.rerun()
 
+    if get_data_for_prediction_button:
         #loadidng current call_id and its interruptions from api
         st.write('Getting next data from server')
         current_call_id = load_current_call_id()
@@ -56,8 +69,9 @@ def main():
         #loading interruptions
         pannes = load_panne_by_id(current_call_id)
         print(f"number of interruptions found  {len(pannes)}")
-        st.session_state.current_pannes = pannes
 
+        st.session_state.current_pannes = pannes
+        st.session_state.show_pannes = True
         #delete current call id if already saved to database
         print(f"delete current call_id if exists {current_call_id}")
         delete_current_call_id_if_exists(current_call_id, st)
@@ -82,9 +96,26 @@ def main():
         st.rerun()
 
     if prediction_button:
-        print(" start prediction ")
-        #pannes = st.session_state.current_pannes
+        st.session_state.show_pannes = True
+        panne = st.session_state.current_pannes.pop(0)
+        values = vars(panne)
+        resp = requests.post(
+            url_predictor_predict,
+            json= convert_dict_to_json(values),
+        )
+        print(resp.json())
         st.rerun()
+
+    if st.session_state.get("show_pannes", False) :
+        pannes = st.session_state.current_pannes
+        if pannes:
+            st.dataframe([vars(panne) for panne in pannes])
+        else:
+            st.info("No pannes to display")
+
+if __name__ == "__main__":
+    main()
+
 
     #with tab2:
         #pannes = get_pannes()
@@ -118,6 +149,3 @@ def main():
         #fig, ax = plt.subplots()
         #ax.hist(dataframe[selected_column].dropna(), bins=20)
         #st.pyplot(fig)
-
-if __name__ == "__main__":
-    main()

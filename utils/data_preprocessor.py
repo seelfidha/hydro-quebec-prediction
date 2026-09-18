@@ -63,6 +63,10 @@ def convert_db_row_to_dict(row):
 def convert_dict_to_json(row):
     date_debut = row["date_debut"]
     date_fin = row["date_fin"]
+    if isinstance(date_debut, str):
+        date_debut = datetime.fromisoformat(date_debut)
+    if isinstance(date_fin, str):
+        date_fin = datetime.fromisoformat(date_fin) if date_fin else None
     return  {
             "nb_clients_impactes": to_float(row["nb_clients_impactes"]),
             "longitude": to_float(row["longitude"]),

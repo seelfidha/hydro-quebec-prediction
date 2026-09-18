@@ -21,6 +21,8 @@ def train_data_status():
 def predict(payload: dict[str, Any] = Body(...)):
     print(payload)
     model_champion = get_model_champion()
+    print(f'Model champion name: {model_champion.name}')
+    print(f'Model champion version: {model_champion.version}')
     return {"received": payload}
 
 if __name__ == "__main__":

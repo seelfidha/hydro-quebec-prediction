@@ -2,3 +2,4 @@ requests
 fastapi
 uvicorn
 mlflow==2.16.2
+h2o==3.46.0.12
