@@ -10,6 +10,12 @@ from utils.params_config import ml_flow_url, predictor_fast_api_host, predictor_
 mlflow.set_tracking_uri(ml_flow_url)
 app = FastAPI()
 
+@app.get("/predict_data/health")
+def train_data_status():
+    return {
+        "predict_data_status": 'ok',
+    }
+
 
 @app.post("/predict")
 def predict(payload: dict[str, Any] = Body(...)):
