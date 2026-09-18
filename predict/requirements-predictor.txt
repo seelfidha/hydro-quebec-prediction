@@ -1,4 +1,4 @@
 requests
 fastapi
 uvicorn
-mlflow
+mlflow==2.16.2

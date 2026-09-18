@@ -121,13 +121,13 @@ def train_model(run_id):
             print(f"Test RMSE: {performance.rmse()}")
             print(f"Test MAE: {performance.mae()}")
 
-def save_the_leader(leader, mlflow):
+def save_the_leader(leader, mlflow_instance):
     model_name = "hydro-quebec-customers"
-    model_info = mlflow.h2o.log_model(
+    model_info = mlflow_instance.h2o.log_model(
         h2o_model = leader,
         artifact_path = "model",
     )
-    version = mlflow.register_model(
+    version = mlflow_instance.register_model(
         model_uri = model_info.model_uri,
         name = model_name
     )
@@ -135,7 +135,7 @@ def save_the_leader(leader, mlflow):
     mlflow_client.set_registered_model_alias (
         name = model_name,
         alias = "champion",
-        verison = version.version
+        version = version.version
     )
 
 def preprocess_training_data():

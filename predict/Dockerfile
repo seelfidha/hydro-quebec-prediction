@@ -1,4 +1,5 @@
-FROM python
+# Match trainer/MLflow; their pinned dependencies need a supported Python version.
+FROM python:3.11-slim
 WORKDIR /app
 
 COPY predict/requirements-predictor.txt .

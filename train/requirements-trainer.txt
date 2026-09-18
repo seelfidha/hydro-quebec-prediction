@@ -1,5 +1,5 @@
 h2o
-mlflow
+mlflow==2.16.2
 psycopg[binary]
 pandas
 minio
