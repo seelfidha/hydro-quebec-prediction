@@ -1,7 +1,6 @@
 from threading import Lock
 
 import mlflow
-import pandas as pd
 import h2o
 import uvicorn
 from fastapi import FastAPI, BackgroundTasks
@@ -11,8 +10,7 @@ from h2o.automl import H2OAutoML
 from mlflow import MlflowClient
 from psycopg.types import none
 
-from repository.pannes_repository import get_pannes
-from utils.data_preprocessor import convert_rows_to_h2o_format, handle_h2o_categorical_data, save_minio_instance
+from utils.data_preprocessor import preprocess_training_data
 from utils.params_config import ml_flow_url, h2o_port, h2o_host, minio_url, minio_access_key, minio_secret, \
     trainer_fast_api_host, trainer_fast_api_port, target_column
 
@@ -84,7 +82,7 @@ def train_model(run_id):
     with training_lock:
         with mlflow.start_run(run_id=run_id):
             print("Get the data")
-            train_frame = preprocess_training_data()
+            train_frame = preprocess_training_data(client_minio)
 
             predictors = [column for column in train_frame.columns if column != target_column]
             train, valid, test = train_frame.split_frame(ratios=[0.7, 0.15], seed=42)
@@ -137,18 +135,6 @@ def save_the_leader(leader, mlflow_instance):
         alias = "champion",
         version = version.version
     )
-
-def preprocess_training_data():
-    print("read database")
-    rows = get_pannes()
-    print(f"convert {len(rows)} rows to h2o format")
-    feature_rows = convert_rows_to_h2o_format(rows)
-    print("create pandas frame")
-    pandas_frame = pd.DataFrame(feature_rows)
-    print("save version data to minio")
-    save_minio_instance(pandas_frame, client_minio, bucket)
-    return handle_h2o_categorical_data(pandas_frame)
-
 
 def init_h2o():
     h2o.init(

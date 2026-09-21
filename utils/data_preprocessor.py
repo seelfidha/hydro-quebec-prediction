@@ -1,9 +1,13 @@
 from datetime import datetime
 from io import BytesIO
+import pandas as pd
 
 import h2o
 
+from repository.pannes_repository import get_pannes
 from utils.params_config import target_column
+
+bucket = "csv-data"
 
 PANNES_COLUMNS = [
     "id",
@@ -29,6 +33,18 @@ CATEGORICAL_COLUMNS = [
     "is_active",
     "debut_day_of_week",
 ]
+
+def preprocess_training_data(client_minio):
+    print("read database")
+    rows = get_pannes()
+    print(f"convert {len(rows)} rows to h2o format")
+    feature_rows = convert_rows_to_h2o_format(rows)
+    print("create pandas frame")
+    pandas_frame = pd.DataFrame(feature_rows)
+    print("save version data to minio")
+    save_minio_instance(pandas_frame, client_minio, bucket)
+    return handle_h2o_categorical_data(pandas_frame)
+
 
 def handle_h2o_categorical_data(pandas_frame):
     # Set types before parsing so numeric category codes are not inferred as real values.
