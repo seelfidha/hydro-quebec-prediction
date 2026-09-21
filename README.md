@@ -32,3 +32,6 @@ to export data & structure from postgres container instance:
 open terminal inside 'database' project folder and execute the following command: 
 docker exec postgres_db pg_dump -U root -d test_db --schema-only | Set-Content -Encoding utf8 .\database\schema.sql
 docker exec postgres_db pg_dump -U root -d test_db --data-only | Set-Content -Encoding utf8 .\database\data-not-null.sql
+
+to run the streamlit interface execute in a terminal the following command line: 
+"python -m streamlit run streamlit/main.py"
