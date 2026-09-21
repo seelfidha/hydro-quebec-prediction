@@ -53,8 +53,9 @@ def load_panne_by_id(callID):
     data = respData.json()
     pannes = []
     for panne_json in data['pannes']:
-        newPanne = create_new_interruption_from_json(callID, panne_json)
-        pannes.append(newPanne)
+        if panne_json[2] != "":
+            newPanne = create_new_interruption_from_json(callID, panne_json)
+            pannes.append(newPanne)
     return pannes
 
 
