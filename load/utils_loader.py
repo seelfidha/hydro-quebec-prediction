@@ -64,8 +64,9 @@ def execute_data_collection():
             # parse interruption data
             data = respData.json()
             for panne_json in data['pannes']:
-                newPanne = create_new_interruption_from_json(callID, panne_json)
-                save_new_panne(callID, newPanne)
+                if panne_json[2] != '':
+                    newPanne = create_new_interruption_from_json(callID, panne_json)
+                    save_new_panne(callID, newPanne)
         else:
             print(f'error saving call_id {callID}')
     else:
