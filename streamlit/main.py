@@ -16,13 +16,6 @@ def main():
 
     #tab1, tab2, tab3 = st.tabs(["prediction", "Description", "Liste de colonnes"])
 
-    # algorithm :
-    # get the current id
-    # read information from the api
-    # predict next data
-    # save to the database if not exist
-    #with tab1:
-    #init variable current_call_id
     init_session_vars(st)
 
     #deactivate button stop_collecting_data once current_call_id is not null
@@ -96,22 +89,31 @@ def main():
         st.rerun()
 
     if prediction_button:
-        st.session_state.show_pannes = True
-        panne = st.session_state.current_pannes.pop(0)
-        values = vars(panne)
-        json = convert_dict_to_json(values)
+
+        json = get_first_element_as_json()
+
+        if json[target_column] is None:
+            print("------------------------------------------------")
+            print("Missing data for end date, cannot run prediction")
+            st.rerun()
+
         target = json.pop(target_column)
-        # print(json)
+        st.session_state.prediction_target_value = target
+        print(f"target value: {target}")
+        print(f"json used for prediction: {json}")
         try:
             resp = requests.post(
                 url_predictor_predict,
                 json=json,
             )
-        except Exception:
-            print('Error in prediction')
+            st.session_state.display_prediction = True
+        except Exception :
+            print(f'Error in prediction')
             resp = None
+            st.session_state.display_prediction = False
+
         if resp is not None:
-            print(f'real target value: {target} vs predicted value: {resp.json().get("prediction")}')
+            st.session_state.prediction_estimated_value = resp.json().get("prediction")
         else:
             print(f'Cannot predict target value, real value is {target}')
         st.rerun()
@@ -122,6 +124,19 @@ def main():
             st.dataframe([vars(panne) for panne in pannes])
         else:
             st.info("No pannes to display")
+
+
+    if st.session_state.get("display_prediction") :
+        st.write(f'real target value: {st.session_state.get('prediction_target_value')} ')
+        st.write(f'predicted value: {st.session_state.get("prediction_estimated_value")['predict']['0']}')
+    else:
+        st.write(f'real target value: {st.session_state.get('prediction_target_value')}')
+
+def get_first_element_as_json():
+    st.session_state.show_pannes = True
+    panne = st.session_state.current_pannes.pop(0)
+    values = vars(panne)
+    return convert_dict_to_json(values)
 
 if __name__ == "__main__":
     main()
