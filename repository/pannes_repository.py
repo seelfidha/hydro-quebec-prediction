@@ -6,7 +6,7 @@ def get_pannes():
     with get_connection_with_retries(10, 3) as conn:
         try:
             with conn.cursor() as cursor:
-                query = "SELECT * FROM pannes ORDER BY id DESC"
+                query = "SELECT * FROM pannes where cause != '' ORDER BY id DESC"
                 cursor.execute(query)
                 rows = cursor.fetchall()
                 return rows

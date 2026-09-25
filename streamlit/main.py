@@ -91,16 +91,13 @@ def main():
     if prediction_button:
 
         json = get_first_element_as_json()
-
-        if json[target_column] is None:
+        if json[target_column] is None or json['cause'] =='':
             print("------------------------------------------------")
-            print("Missing data for end date, cannot run prediction")
+            print("Missing data for end date or cause, cannot run prediction")
             st.rerun()
 
         target = json.pop(target_column)
         st.session_state.prediction_target_value = target
-        print(f"target value: {target}")
-        print(f"json used for prediction: {json}")
         try:
             resp = requests.post(
                 url_predictor_predict,
@@ -129,6 +126,9 @@ def main():
     if st.session_state.get("display_prediction") :
         st.write(f'real target value: {st.session_state.get('prediction_target_value')} ')
         st.write(f'predicted value: {st.session_state.get("prediction_estimated_value")['predict']['0']}')
+        print(f'real target value vs predicted value: '
+              f'{st.session_state.get('prediction_target_value')} : '
+              f'{st.session_state.get("prediction_estimated_value")['predict']['0']}')
     else:
         st.write(f'real target value: {st.session_state.get('prediction_target_value')}')
 
@@ -136,41 +136,8 @@ def get_first_element_as_json():
     st.session_state.show_pannes = True
     panne = st.session_state.current_pannes.pop(0)
     values = vars(panne)
-    return convert_dict_to_json(values)
+    json_format_values = convert_dict_to_json(values)
+    return json_format_values
 
 if __name__ == "__main__":
     main()
-
-
-    #with tab2:
-        #pannes = get_pannes()
-        #parsed = [row[0] for row in get_columns_names()]
-        #st.write(f"Il y'a actuellement {len(pannes)} interruptions enregistrees dans la base de donnees")
-        #column_names = []
-        #for i in range(len(parsed)):
-        #    column_names.append(parsed[i])
-        #dataframe = pd.DataFrame(pannes, columns=column_names)
-        #st.dataframe(dataframe.head())
-
-        #st.write(dataframe.describe().T)
-
-        #st.write('Liste des colonnes avec le % de données manquantes:')
-        #missingSummary = pd.DataFrame({
-        #    'Nombre': dataframe.isnull().sum(),
-        #    'Pourcentage': (dataframe.isnull().mean() * 100).round(2)
-        #})
-
-        #missingSummary = missingSummary[missingSummary['Nombre'] > 0]
-        #if missingSummary.empty:
-        #    st.success("Aucune donnée manquante.")
-        #else:
-        #    st.dataframe(missingSummary)
-
-    #with tab3:
-        #st.header("Liste de colonnes ")
-        #options = [col for col in dataframe.columns if col != "id" and col != "callid_processed"]
-        #selected_column = st.selectbox("Colonne", options)
-        #st.write(f"La colonne selectionnée est {selected_column}")
-        #fig, ax = plt.subplots()
-        #ax.hist(dataframe[selected_column].dropna(), bins=20)
-        #st.pyplot(fig)

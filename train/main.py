@@ -84,6 +84,8 @@ def train_model(run_id):
             print("Get the data")
             train_frame = preprocess_training_data(client_minio)
 
+            print("liste des colonnes utilisees pour la prediction:", train_frame.col_names)
+
             predictors = [column for column in train_frame.columns if column != target_column]
             train, valid, test = train_frame.split_frame(ratios=[0.7, 0.15], seed=42)
 

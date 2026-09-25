@@ -26,7 +26,7 @@ PANNES_COLUMNS = [
 ]
 
 CATEGORICAL_COLUMNS = [
-    "cause",
+    #"cause",
     "pannep",
     "statut",
     "id_municipalite",
@@ -92,14 +92,14 @@ def convert_dict_to_json(row):
             "nb_clients_impactes": to_float(row["nb_clients_impactes"]),
             "longitude": to_float(row["longitude"]),
             "latitude": to_float(row["latitude"]),
-            "cause": row["cause"] or "unknown",
-            "statut": row["statut"] or "unknown",
-            "id_municipalite": row["id_municipalite"] or "unknown",
-            "pannep": row["pannep"] or "unknown",
-            "debut_hour": date_debut.hour,
-            "debut_day_of_week": date_debut.weekday(),
-            "debut_month": date_debut.month,
-            "is_active": "yes" if date_fin is None else "no",
+            "cause": row["cause"],
+            "statut": row["statut"],
+            # "id_municipalite": row["id_municipalite"]",
+            #"pannep": row["pannep"]",
+            #"debut_hour": date_debut.hour,
+            #"debut_day_of_week": date_debut.weekday(),
+            #"debut_month": date_debut.month,
+            #"is_active": "yes" if date_fin is None else "no",
             "duration_minutes": (
                 (date_fin - date_debut).total_seconds() / 60
                 if isinstance(date_fin, datetime)
